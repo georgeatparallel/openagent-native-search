@@ -133,6 +133,20 @@ Connect every major LLM provider and switch between them per conversation — no
 
 ---
 
+### Parallel web search
+
+To use Parallel for an agent's normal `web_search` calls:
+
+1. In **Tools**, create or edit a tool with **Type** `web_search` and **Sub type** `Parallel`, then save it.
+2. Add that tool to the agent store's **Tools** selection. The tool editor's test panel can also run a search without calling a model.
+3. To stop using Parallel, remove the tool from the store or change its subtype to another provider. DuckDuckGo remains the default for new web-search tools and tools with an empty subtype.
+
+This option uses anonymous, rate-limited [Parallel Search MCP](https://docs.parallel.ai/integrations/mcp/search-mcp) at `https://search.parallel.ai/mcp`. It needs no Parallel account or API key. Saved Provider URL and credential fields are not used by this connection. Once enabled, the agent can send its search queries to Parallel. Requests include an `openagent/<build version>` User-Agent so Parallel can measure aggregate project usage. See Parallel's [Customer Terms](https://parallel.ai/customer-terms) and [Privacy Policy](https://parallel.ai/privacy-policy).
+
+Parallel provides text search here. Result count is limited locally; language and country filters are unavailable and rejected if supplied. This subtype does not expose `image_search` or change the separate `web_fetch` tool. The builtin interface supplies no conversation identity, so optional Parallel conversation metadata is omitted.
+
+---
+
 ### 📚 RAG & Knowledge Base
 
 | Capability               | Description                                                                                   |

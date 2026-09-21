@@ -66,19 +66,23 @@ func NewWebSearchTool(config Config) (*WebSearchTool, error) {
 }
 
 func (p *WebSearchTool) BuiltinTools() []BuiltinTool {
-	return []BuiltinTool{&webSearchBuiltin{
-		engine:         p.engine,
-		apiKey:         p.apiKey,
-		searchEngineID: p.searchEngineID,
-		endpoint:       p.endpoint,
-		httpClient:     p.httpClient,
-	}, &imageSearchBuiltin{
+	tools := []BuiltinTool{&webSearchBuiltin{
 		engine:         p.engine,
 		apiKey:         p.apiKey,
 		searchEngineID: p.searchEngineID,
 		endpoint:       p.endpoint,
 		httpClient:     p.httpClient,
 	}}
+	if p.engine == webSearchEngineParallel {
+		return tools
+	}
+	return append(tools, &imageSearchBuiltin{
+		engine:         p.engine,
+		apiKey:         p.apiKey,
+		searchEngineID: p.searchEngineID,
+		endpoint:       p.endpoint,
+		httpClient:     p.httpClient,
+	})
 }
 
 type webSearchBuiltin struct {
@@ -104,6 +108,7 @@ const (
 	webSearchEngineBing       webSearchEngine = "bing"
 	webSearchEngineGoogle     webSearchEngine = "google"
 	webSearchEngineBaidu      webSearchEngine = "baidu"
+	webSearchEngineParallel   webSearchEngine = "parallel"
 )
 
 var (
@@ -139,6 +144,7 @@ type webSearchPayload struct {
 	Count           int                      `json:"count"`
 	ExternalContent webSearchExternalContent `json:"externalContent"`
 	Results         []webSearchResult        `json:"results"`
+	Warnings        []string                 `json:"warnings,omitempty"`
 }
 
 type googleSearchResponse struct {
@@ -202,7 +208,7 @@ func (t *webSearchBuiltin) GetDescription() string {
 }
 
 func (t *webSearchBuiltin) GetInputSchema() interface{} {
-	return map[string]interface{}{
+	schema := map[string]interface{}{
 		"type":                 "object",
 		"additionalProperties": false,
 		"properties": map[string]interface{}{
@@ -230,15 +236,35 @@ func (t *webSearchBuiltin) GetInputSchema() interface{} {
 		},
 		"required": []string{"query"},
 	}
+	if t.engine == webSearchEngineParallel {
+		properties := schema["properties"].(map[string]interface{})
+		delete(properties, "language")
+		delete(properties, "country")
+	}
+	return schema
 }
 
 func (t *webSearchBuiltin) Execute(ctx context.Context, arguments map[string]interface{}) (*protocol.CallToolResult, error) {
+	if t.engine == webSearchEngineParallel {
+		for _, key := range []string{"language", "country"} {
+			if _, supplied := arguments[key]; supplied {
+				return webSearchToolError("Parallel search does not support " + key + " filtering; omit this parameter."), nil
+			}
+		}
+	}
 	params, err := parseWebSearchArguments(arguments)
 	if err != nil {
 		return webSearchToolError(err.Error()), nil
 	}
 
-	results, provider, err := t.runWebSearch(ctx, params)
+	var results []webSearchResult
+	var warnings []string
+	provider := "parallel"
+	if t.engine == webSearchEngineParallel {
+		results, warnings, err = runParallelSearch(ctx, params, t.httpClient)
+	} else {
+		results, provider, err = t.runWebSearch(ctx, params)
+	}
 	if err != nil {
 		return webSearchToolError(fmt.Sprintf("Web search failed: %s", err.Error())), nil
 	}
@@ -258,7 +284,8 @@ func (t *webSearchBuiltin) Execute(ctx context.Context, arguments map[string]int
 			Untrusted: true,
 			Source:    "web_search",
 		},
-		Results: results,
+		Results:  results,
+		Warnings: warnings,
 	}
 
 	payloadBytes, err := json.Marshal(payload)
@@ -355,6 +382,8 @@ func parseWebSearchEngine(value string) (webSearchEngine, error) {
 		return webSearchEngineGoogle, nil
 	case "Baidu":
 		return webSearchEngineBaidu, nil
+	case "Parallel":
+		return webSearchEngineParallel, nil
 	default:
 		return "", fmt.Errorf("unsupported web search engine subtype: %s", value)
 	}

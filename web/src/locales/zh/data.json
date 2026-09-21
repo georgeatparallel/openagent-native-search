@@ -1248,6 +1248,8 @@
     "OpenAgent Chrome Extension - Step 2": "在Chrome中打开扩展弹出窗口。",
     "OpenAgent Chrome Extension - Step 3": "输入http://127.0.0.1:14000并点击「连接」。",
     "OpenAgent Chrome Extension - Step 4": "Browser Use将开始操控您当前的Chrome标签页。",
+    "Parallel search docs": "Parallel Search MCP文档",
+    "Parallel search setup": "选择Parallel后，将使用https://search.parallel.ai/mcp提供的匿名Search MCP服务，访问受速率限制，无需Parallel账户或API密钥。启用后，智能体可向Parallel发送搜索查询。OpenAgent发送包含项目名和构建版本的User-Agent，供Parallel统计项目总体使用情况。此提供商仅支持文本搜索，结果数量在本地限制，不支持语言或国家筛选。此匿名连接不会使用已保存的提供商URL或API密钥。",
     "Prompt examples": "提示词示例",
     "Prompt examples - Tooltip": "展示如何有效使用此工具的示例提示词。",
     "User Chrome": "用户Chrome"

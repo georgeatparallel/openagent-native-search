@@ -216,7 +216,13 @@ class ToolEditPage extends React.Component {
                 12
               )
             ) : null}
-            {["web_search", "web_fetch", "web_browser", "local_file"].includes(tool.type) ? (
+            {tool.type === "web_search" && tool.subType === "Parallel" ? (
+              <Col span={24} style={{marginTop: "12px"}}>
+                <div>{i18next.t("tool:Parallel search setup")}</div>
+                <a href="https://docs.parallel.ai/integrations/mcp/search-mcp" target="_blank" rel="noreferrer">{i18next.t("tool:Parallel search docs")}</a>
+              </Col>
+            ) : null}
+            {["web_search", "web_fetch", "web_browser", "local_file"].includes(tool.type) && !(tool.type === "web_search" && tool.subType === "Parallel") ? (
               this.renderToolField(
                 this.getProviderUrlLabel(tool),
                 <Input value={tool.providerUrl} onChange={e => {

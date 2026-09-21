@@ -128,6 +128,20 @@ docker-compose up
 
 ---
 
+### Parallel网页搜索
+
+要让智能体通过常规`web_search`调用使用Parallel：
+
+1. 在**工具**中创建或编辑工具，将**类型**设为`web_search`，**子类型**设为`Parallel`，然后保存。
+2. 在智能体知识库的**工具**选项中选择该工具。工具编辑器的测试面板也能在不调用模型的情况下执行搜索。
+3. 停止使用Parallel时，从知识库中移除该工具，或改用其他子类型。新建网页搜索工具和子类型为空的工具仍默认使用DuckDuckGo。
+
+此选项通过`https://search.parallel.ai/mcp`使用匿名、受速率限制的[Parallel Search MCP](https://docs.parallel.ai/integrations/mcp/search-mcp)，无需Parallel账户或API密钥。此连接不使用已保存的提供商URL或凭据。启用后，智能体可向Parallel发送搜索查询。请求包含`openagent/<构建版本>`的User-Agent，供Parallel统计项目总体使用情况。请参阅Parallel的[客户条款](https://parallel.ai/customer-terms)和[隐私政策](https://parallel.ai/privacy-policy)。
+
+此处Parallel仅提供文本搜索。结果数量在本地限制，不支持语言和国家筛选，传入这些参数会返回错误。此子类型不提供`image_search`，也不改变独立的`web_fetch`工具。内置工具接口不提供对话标识，因此省略Parallel可选的对话元数据。
+
+---
+
 ### 📚 RAG 与知识库
 
 | 能力               | 说明                                                                                   |

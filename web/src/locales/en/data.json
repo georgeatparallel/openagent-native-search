@@ -1248,6 +1248,8 @@
     "OpenAgent Chrome Extension - Step 2": "Open the extension popup in Chrome.",
     "OpenAgent Chrome Extension - Step 3": "Enter http://127.0.0.1:14000 and click Connect.",
     "OpenAgent Chrome Extension - Step 4": "Browser Use will now operate your current Chrome tabs.",
+    "Parallel search docs": "Parallel Search MCP documentation",
+    "Parallel search setup": "Select Parallel to use anonymous, rate-limited Search MCP at https://search.parallel.ai/mcp. No Parallel account or API key is required. Once enabled, the agent can send search queries to Parallel. OpenAgent sends a project and build version User-Agent so Parallel can measure aggregate project usage. This provider supports text search only; result count is applied locally, and language/country filters are unavailable. Existing Provider URL and API key values are not used by this anonymous connection.",
     "Prompt examples": "Prompt examples",
     "Prompt examples - Tooltip": "Example prompts that show how to use this tool effectively.",
     "User Chrome": "User Chrome"

@@ -443,6 +443,13 @@ export function getToolFunctions(tool) {
     }];
   }
   if (type === "web_search") {
+    if (subType === "Parallel") {
+      return [{
+        name: "web_search",
+        description: "Search the web using Parallel Search MCP",
+        testContent: JSON.stringify({tool: "web_search", arguments: {query: "OpenAgent web search", count: 3}}, null, 2),
+      }];
+    }
     return [
       {
         name: "web_search",
