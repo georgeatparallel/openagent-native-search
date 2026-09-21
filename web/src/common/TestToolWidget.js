@@ -86,12 +86,15 @@ class TestToolWidget extends React.Component {
       return;
     }
 
-    if (tool.type === "office") {
+    if (["office", "web_search"].includes(tool.type)) {
       const currentSubType = tool.subType || null;
       if (currentSubType !== this.state.lastSyncedSubType) {
+        const previousDefault = buildDefaultToolTestJson({type: tool.type, subType: this.state.lastSyncedSubType});
         // eslint-disable-next-line react/no-did-update-set-state
         this.setState({lastSyncedSubType: currentSubType});
-        if (this.props.onUpdateTool) {
+        // Search subtypes have different supported arguments. Refresh an
+        // untouched example while preserving a user's custom test query.
+        if (this.props.onUpdateTool && (tool.type === "office" || tool.testContent === previousDefault)) {
           this.props.onUpdateTool("testContent", buildDefaultToolTestJson(tool));
         }
         return;
